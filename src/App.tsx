@@ -12,6 +12,7 @@ import LearningHub from "@/pages/LearningHub";
 import AIMentor from "@/pages/AIMentor";
 import SmartEditor from "@/pages/SmartEditor";
 import DevArena from "@/pages/DevArena";
+import NewsPage from "./pages/NewsPage";
 import NotFound from "@/pages/NotFound";
 import MockInterviewPage from "./pages/MockInterviewPage";
 
@@ -66,6 +67,7 @@ function AppRoutes() {
         <Route path="ai-mentor" element={<AIMentor />} />
         <Route path="smart-editor" element={<SmartEditor />} />
         <Route path="dev-arena" element={<DevArena />} />
+        <Route path="/tech-news" element={<NewsPage />} />
         <Route path="/mock-interview" element={<MockInterviewPage />} />
       </Route>
       <Route path="*" element={<NotFound />} />

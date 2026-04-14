@@ -1,6 +1,7 @@
 import { LayoutDashboard, BookOpen, Bot, Code, Swords, HelpCircle, GraduationCap, UserCheck } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
+import { Newspaper } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -17,6 +18,7 @@ const navItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Learning Hub", url: "/learning-hub", icon: BookOpen },
   { title: "AI Mentor", url: "/ai-mentor", icon: Bot },
+  { title: "Tech News", url: "/tech-news", icon: Newspaper },
   { title: "Mock Interview", url: "/mock-interview", icon: UserCheck }, // <-- Added this line
   { title: "Smart Editor", url: "/smart-editor", icon: Code },
   { title: "Dev Arena", url: "/dev-arena", icon: Swords },
