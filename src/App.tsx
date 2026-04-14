@@ -13,6 +13,7 @@ import AIMentor from "@/pages/AIMentor";
 import SmartEditor from "@/pages/SmartEditor";
 import DevArena from "@/pages/DevArena";
 import NotFound from "@/pages/NotFound";
+import MockInterviewPage from "./pages/MockInterviewPage";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +66,7 @@ function AppRoutes() {
         <Route path="ai-mentor" element={<AIMentor />} />
         <Route path="smart-editor" element={<SmartEditor />} />
         <Route path="dev-arena" element={<DevArena />} />
+        <Route path="/mock-interview" element={<MockInterviewPage />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
