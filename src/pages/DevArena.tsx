@@ -29,7 +29,7 @@ const EASY_QUESTIONS = [
       { input: { nums: [3, 2, 4], target: 6 }, expected: [1, 2] },
       { input: { nums: [3, 3], target: 6 }, expected: [0, 1] }
     ],
-    starter: { 
+    starter: {
       javascript: `function twoSum(nums, target) {\n  // Your solution here\n  \n}`,
       python: `def twoSum(nums, target):\n    # Your solution here\n    pass`,
       cpp: `class Solution {\npublic:\n    vector<int> twoSum(vector<int>& nums, int target) {\n        // Your solution here\n    }\n};`
@@ -47,7 +47,7 @@ const EASY_QUESTIONS = [
       { input: { s: "()[]{}" }, expected: true },
       { input: { s: "(]" }, expected: false }
     ],
-    starter: { 
+    starter: {
       javascript: `function isValid(s) {\n  \n}`,
       python: `def isValid(s):\n    pass`,
       cpp: `class Solution {\npublic:\n    bool isValid(string s) {\n        \n    }\n};`
@@ -60,8 +60,8 @@ const EASY_QUESTIONS = [
     id: "e3", title: "Reverse String",
     description: "Write a function that reverses a string. The input string is given as an array of characters s.",
     examples: [{ input: 's=["h","e","l","l","o"]', output: '["o","l","l","e","h"]' }],
-    testCases: [{ input: { s: ["h","e","l","l","o"] }, expected: ["o","l","l","e","h"] }],
-    starter: { 
+    testCases: [{ input: { s: ["h", "e", "l", "l", "o"] }, expected: ["o", "l", "l", "e", "h"] }],
+    starter: {
       javascript: `function reverseString(s) {\n  \n}`,
       python: `def reverseString(s):\n    pass`,
       cpp: `class Solution {\npublic:\n    void reverseString(vector<char>& s) {\n        \n    }\n};`
@@ -88,7 +88,7 @@ const Confetti = () => {
     <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
       {pieces.map((p, i) => (
         <div key={i} className="absolute top-[-10%] w-3 h-3 rounded-sm"
-             style={{ left: `${p.left}%`, background: p.color, animation: `fall ${p.dur}s linear ${p.delay}s forwards` }} />
+          style={{ left: `${p.left}%`, background: p.color, animation: `fall ${p.dur}s linear ${p.delay}s forwards` }} />
       ))}
       <style>{`@keyframes fall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }`}</style>
     </div>
@@ -134,15 +134,15 @@ export default function DevArena() {
   const [showSkip, setShowSkip] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [solvedBy, setSolvedBy] = useState<Record<number, "me" | "opponent">>({});
-  
+
   const [syncEvent, setSyncEvent] = useState<{ index: number, ts: number } | null>(null);
   const [searchTimer, setSearchTimer] = useState(10);
   const [pointWinner, setPointWinner] = useState<string | null>(null);
-  
+
   const timerRef = useRef<any>(null);
   const gameChannelRef = useRef<any>(null);
   const matchChannelRef = useRef<any>(null);
-  
+
   const qIdxRef = useRef(qIdx);
   useEffect(() => {
     qIdxRef.current = qIdx;
@@ -155,7 +155,7 @@ export default function DevArena() {
   const searchForMatch = async () => {
     setScreen("searching");
     setIsBotMode(false);
-    setOpponentName(""); 
+    setOpponentName("");
     setSearchTimer(10);
 
     const { data: waitingMatches } = await supabase
@@ -171,24 +171,24 @@ export default function DevArena() {
         .from('matches')
         .update({ player2: username, status: 'playing' })
         .eq('id', match.id);
-      
+
       setMatchId(match.id);
       setOpponentName(match.player1);
       setupGameChannel(match.id);
-      setTimeout(() => setScreen("battle"), 1500); 
+      setTimeout(() => setScreen("battle"), 1500);
     } else {
       const { data: newMatch } = await supabase
         .from('matches')
         .insert({ level, player1: username, status: 'waiting' })
         .select()
         .single();
-      
+
       if (newMatch) {
         setMatchId(newMatch.id);
-        
+
         matchChannelRef.current = supabase.channel(`match-${newMatch.id}`)
-          .on('postgres_changes', { 
-            event: 'UPDATE', schema: 'public', table: 'matches', filter: `id=eq.${newMatch.id}` 
+          .on('postgres_changes', {
+            event: 'UPDATE', schema: 'public', table: 'matches', filter: `id=eq.${newMatch.id}`
           }, (payload) => {
             if (payload.new.status === 'playing') {
               setOpponentName(payload.new.player2);
@@ -234,7 +234,7 @@ export default function DevArena() {
             setTimeout(() => setScreen("battle"), 1500);
           }
         }
-      }, 1000); 
+      }, 1000);
     }
     return () => clearInterval(interval);
   }, [screen, matchId, isBotMode, opponentName]);
@@ -290,10 +290,10 @@ export default function DevArena() {
   // Unified solve logic
   const handleOpponentRealSolve = (solvedIndex: number) => {
     setSolvedBy(prev => ({ ...prev, [solvedIndex]: "opponent" }));
-    setOppScore(s => s + 100); 
+    setOppScore(s => s + 100);
     setMyHP(h => Math.max(0, h - 34));
     // Yahan se setPointWinner(opponentName) hata diya gaya hai
-    
+
     if (solvedIndex >= qIdxRef.current) {
       setShowSkip(true);
       setTimeout(() => {
@@ -302,7 +302,7 @@ export default function DevArena() {
         if (solvedIndex < activeQuestions.length - 1) {
           const nextIdx = solvedIndex + 1;
           setHighestUnlocked(prev => Math.max(prev, nextIdx));
-          setQIdx(nextIdx); 
+          setQIdx(nextIdx);
         } else {
           setScreen("result");
         }
@@ -342,7 +342,7 @@ export default function DevArena() {
   const handleWin = () => {
     const currentIdx = qIdxRef.current;
     setSolvedBy(prev => ({ ...prev, [currentIdx]: "me" }));
-    setMyScore(s => s + 100); 
+    setMyScore(s => s + 100);
     setOppHP(h => Math.max(0, h - 34));
     setShowConfetti(true);
     setPointWinner("You"); // Show Point Toast only for you
@@ -379,16 +379,15 @@ export default function DevArena() {
           <div className="mb-5">
             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Your Username</label>
             <input type="text" value={username} onChange={e => setUsername(e.target.value)}
-                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-violet-500/50 transition-all"/>
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-violet-500/50 transition-all" />
           </div>
           <div className="mb-8">
             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Select Difficulty</label>
             <div className="flex gap-2">
               {(["easy", "medium", "hard"] as Level[]).map((lvl) => (
                 <button key={lvl} onClick={() => setLevel(lvl)}
-                  className={`flex-1 py-2.5 rounded-xl text-sm font-bold capitalize transition-all border ${
-                    level === lvl ? "bg-violet-50 border-violet-500 text-violet-700 shadow-sm" : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50"
-                  }`}>{lvl}</button>
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-bold capitalize transition-all border ${level === lvl ? "bg-violet-50 border-violet-500 text-violet-700 shadow-sm" : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50"
+                    }`}>{lvl}</button>
               ))}
             </div>
           </div>
@@ -415,12 +414,11 @@ export default function DevArena() {
               <span className="text-sm font-bold text-slate-700">{username}</span>
             </div>
             <span className="text-slate-300 font-black text-xl italic">VS</span>
-            
+
             {/* UPDATED UI FOR SEARCHING / FOUND OPPONENT WITH TIMER */}
             <div className="flex flex-col items-center gap-2">
-              <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl border-2 transition-all ${
-                opponentName ? 'bg-rose-100 border-rose-500' : 'bg-slate-100 border-slate-200 animate-pulse'
-              }`}>
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl border-2 transition-all ${opponentName ? 'bg-rose-100 border-rose-500' : 'bg-slate-100 border-slate-200 animate-pulse'
+                }`}>
                 {opponentName ? (isBotMode ? '🤖' : '👤') : '?'}
               </div>
               <span className={`text-sm font-bold ${opponentName ? 'text-rose-600' : 'text-slate-500'}`}>
@@ -428,7 +426,7 @@ export default function DevArena() {
               </span>
             </div>
           </div>
-          
+
           {!opponentName && (
             <div className="text-slate-400 text-xs mt-4 font-bold bg-slate-50 py-2 rounded-lg border border-slate-100">
               Auto-connecting to Bot in <span className="text-violet-600 text-base">{searchTimer}s</span>...
@@ -443,7 +441,7 @@ export default function DevArena() {
     <div className="h-screen flex flex-col bg-slate-50 font-sans text-slate-800 overflow-hidden relative">
       {showConfetti && <Confetti />}
       {showSkip && <SkipNotif opponentName={opponentName} />}
-      
+
       {/* 100 POINTS TOAST POPUP */}
       {pointWinner && <PointPopup player={pointWinner} isMe={pointWinner === "You"} />}
 
@@ -452,7 +450,7 @@ export default function DevArena() {
           <span className="text-xs font-bold text-slate-500">👤 {username}</span>
           <div className="flex items-center gap-2">
             <div className="w-32 h-2.5 bg-slate-100 rounded-full overflow-hidden">
-              <div className="h-full bg-emerald-500 transition-all duration-500" style={{ width: `${myHP}%` }}/>
+              <div className="h-full bg-emerald-500 transition-all duration-500" style={{ width: `${myHP}%` }} />
             </div>
             <span className="text-xs font-bold text-emerald-600">{myHP}HP</span>
           </div>
@@ -471,7 +469,7 @@ export default function DevArena() {
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold text-rose-500">{oppHP}HP</span>
             <div className="w-32 h-2.5 bg-slate-100 rounded-full overflow-hidden">
-              <div className="h-full bg-rose-500 transition-all duration-500" style={{ width: `${oppHP}%` }}/>
+              <div className="h-full bg-rose-500 transition-all duration-500" style={{ width: `${oppHP}%` }} />
             </div>
           </div>
         </div>
@@ -486,21 +484,19 @@ export default function DevArena() {
               const status = solvedBy[i];
 
               return (
-                <div 
-                  key={i} 
+                <div
+                  key={i}
                   onClick={() => isUnlocked && setQIdx(i)}
-                  className={`px-6 py-4 text-sm font-bold flex items-center gap-3 border-b-2 whitespace-nowrap transition-all ${
-                    isActive ? "border-violet-600 text-slate-800 bg-slate-50/50" 
-                    : status === "opponent" ? "border-rose-600 text-rose-500" 
-                    : "border-transparent text-slate-500"
-                  } ${!isUnlocked ? "opacity-40 cursor-not-allowed" : "cursor-pointer hover:bg-slate-50"}`}
+                  className={`px-6 py-4 text-sm font-bold flex items-center gap-3 border-b-2 whitespace-nowrap transition-all ${isActive ? "border-violet-600 text-slate-800 bg-slate-50/50"
+                      : status === "opponent" ? "border-rose-600 text-rose-500"
+                        : "border-transparent text-slate-500"
+                    } ${!isUnlocked ? "opacity-40 cursor-not-allowed" : "cursor-pointer hover:bg-slate-50"}`}
                 >
-                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] transition-all ${
-                    isActive ? "bg-violet-600 text-white" 
-                    : status === "me" ? "bg-emerald-100 text-emerald-600" 
-                    : status === "opponent" ? "bg-rose-700 text-white"
-                    : "bg-slate-200 text-slate-500"
-                  }`}>
+                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] transition-all ${isActive ? "bg-violet-600 text-white"
+                      : status === "me" ? "bg-emerald-100 text-emerald-600"
+                        : status === "opponent" ? "bg-rose-700 text-white"
+                          : "bg-slate-200 text-slate-500"
+                    }`}>
                     {status === "me" && !isActive ? (
                       <CheckCircle2 size={14} strokeWidth={3} />
                     ) : status === "opponent" && !isActive ? (
@@ -537,13 +533,13 @@ export default function DevArena() {
 
         <div className="flex-1 flex flex-col bg-[#0f111a]">
           <div className="bg-[#1a1d27] flex justify-between items-center px-4 py-2 border-b border-[#2d313f]">
-            <span className="text-slate-400 text-xs font-semibold uppercase flex items-center gap-2"><TerminalSquare size={14}/> Code Workspace</span>
+            <span className="text-slate-400 text-xs font-semibold uppercase flex items-center gap-2"><TerminalSquare size={14} /> Code Workspace</span>
             <select value={language} onChange={e => setLanguage(e.target.value as Language)} className="bg-[#2d313f] text-slate-200 border-none text-xs rounded-md px-3 py-1.5 outline-none font-semibold cursor-pointer">
               {LANGUAGES.map(l => <option key={l.id} value={l.id}>{l.label}</option>)}
             </select>
           </div>
           <div className="flex-[3] min-h-0">
-            <Editor height="100%" language={LANGUAGES.find(l => l.id === language)?.monaco || "javascript"} theme="vs-dark" value={code} onChange={v => setCode(v || "")} options={{ minimap: { enabled: false }, fontSize: 14, padding: { top: 16 } }}/>
+            <Editor height="100%" language={LANGUAGES.find(l => l.id === language)?.monaco || "javascript"} theme="vs-dark" value={code} onChange={v => setCode(v || "")} options={{ minimap: { enabled: false }, fontSize: 14, padding: { top: 16 } }} />
           </div>
           <div className="flex-[2] min-h-0 bg-[#151822] border-t border-[#2d313f] flex flex-col">
             <div className="px-5 py-3 border-b border-[#2d313f] flex justify-between items-center bg-[#151822]">
@@ -597,8 +593,8 @@ export default function DevArena() {
               <div className="text-center"><div className="text-4xl font-black text-rose-500">{oppScore}</div><div className="text-xs font-bold text-slate-500 mt-1">OPPONENT</div></div>
             </div>
           </div>
-          <button onClick={() => { 
-            setScreen("lobby"); setQIdx(0); setMyScore(0); setOppScore(0); setMyHP(100); setOppHP(100); setHighestUnlocked(0); setSolvedBy({}); 
+          <button onClick={() => {
+            setScreen("lobby"); setQIdx(0); setMyScore(0); setOppScore(0); setMyHP(100); setOppHP(100); setHighestUnlocked(0); setSolvedBy({});
             if (gameChannelRef.current) supabase.removeChannel(gameChannelRef.current);
             if (matchChannelRef.current) supabase.removeChannel(matchChannelRef.current);
           }} className="w-full py-3.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-all">Play Again</button>
