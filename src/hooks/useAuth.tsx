@@ -15,7 +15,7 @@ const AuthContext = createContext<AuthContextType>({
   session: null,
   loading: true,
   profile: null,
-  signOut: async () => {},
+  signOut: async () => { },
 });
 
 export const useAuth = () => useContext(AuthContext);
