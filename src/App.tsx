@@ -17,6 +17,10 @@ import NewsPage from "./pages/NewsPage";
 import Profile from "@/pages/Profile";
 import NotFound from "@/pages/NotFound";
 import MockInterviewPage from "./pages/MockInterviewPage";
+import InterviewRoomPage from "./pages/InterviewRoomPage";
+import 'regenerator-runtime/runtime';
+import ResultPage from "./pages/ResultPage";
+import CheatSheets from "./pages/CheatSheets";
 
 const queryClient = new QueryClient();
 
@@ -71,6 +75,11 @@ function AppRoutes() {
         <Route path="dev-arena" element={<DevArena />} />
         <Route path="/tech-news" element={<NewsPage />} />
         <Route path="/mock-interview" element={<MockInterviewPage />} />
+        <Route path="/interview-room" element={<InterviewRoomPage />} />
+        <Route path="/result" element={<ResultPage/>} />
+        <Route path="/cheatsheets" element={<CheatSheets/>} />
+
+
         <Route path="profile" element={<Profile />} />
       </Route>
       <Route path="*" element={<NotFound />} />
