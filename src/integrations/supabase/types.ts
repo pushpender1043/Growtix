@@ -22,6 +22,8 @@ export type Database = {
           full_name: string | null
           id: string
           updated_at: string
+          address?: string | null
+          social_links?: Json | null
         }
         Insert: {
           avatar_url?: string | null
@@ -30,6 +32,8 @@ export type Database = {
           full_name?: string | null
           id: string
           updated_at?: string
+          address?: string | null
+          social_links?: Json | null
         }
         Update: {
           avatar_url?: string | null
@@ -38,6 +42,8 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string
+          address?: string | null
+          social_links?: Json | null
         }
         Relationships: []
       }

@@ -7,7 +7,7 @@ const leaderboard = [
   { rank: 2, name: "CodeNinja_X", xp: 42100, badge: "Master", avatar: "⚔️" },
   { rank: 3, name: "ByteQueen", xp: 39800, badge: "Master", avatar: "👑" },
   { rank: 4, name: "StackOverflow_Fan", xp: 37500, badge: "Diamond", avatar: "💎" },
-  { rank: 5, name: "DevElevateUser", xp: 12450, badge: "Gold II", avatar: "🥇" },
+  { rank: 5, name: "GrowtixUser", xp: 12450, badge: "Gold II", avatar: "🥇" },
 ];
 
 const rankColors: Record<string, string> = {
@@ -100,7 +100,7 @@ export default function DevArena() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.08 }}
               className={`flex items-center justify-between p-4 hover:bg-muted/30 transition-colors ${
-                player.name === "DevElevateUser" ? "bg-primary/5" : ""
+                player.name === "GrowtixUser" ? "bg-primary/5" : ""
               }`}
             >
               <div className="flex items-center gap-4">

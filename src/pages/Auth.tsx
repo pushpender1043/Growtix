@@ -61,7 +61,7 @@ export default function Auth() {
           <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-4">
             <GraduationCap className="w-8 h-8 text-primary-foreground" />
           </div>
-          <h1 className="text-3xl font-heading font-bold gradient-text">DevElevate</h1>
+          <h1 className="text-3xl font-heading font-bold gradient-text">Growtix</h1>
           <p className="text-muted-foreground text-sm mt-1">Level up your development skills</p>
         </div>
 

@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
+import { LanguageProvider } from "@/hooks/useLanguage";
 import { AppLayout } from "@/components/AppLayout";
 import Auth from "@/pages/Auth";
 import CountrySelect from "@/pages/CountrySelect";
@@ -13,6 +14,7 @@ import AIMentor from "@/pages/AIMentor";
 import SmartEditor from "@/pages/SmartEditor";
 import DevArena from "@/pages/DevArena";
 import NewsPage from "./pages/NewsPage";
+import Profile from "@/pages/Profile";
 import NotFound from "@/pages/NotFound";
 import MockInterviewPage from "./pages/MockInterviewPage";
 
@@ -69,6 +71,7 @@ function AppRoutes() {
         <Route path="dev-arena" element={<DevArena />} />
         <Route path="/tech-news" element={<NewsPage />} />
         <Route path="/mock-interview" element={<MockInterviewPage />} />
+        <Route path="profile" element={<Profile />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
@@ -82,7 +85,9 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <AppRoutes />
+          <LanguageProvider>
+            <AppRoutes />
+          </LanguageProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
