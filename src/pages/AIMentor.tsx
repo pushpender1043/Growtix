@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, Sparkles, Network, Mic, Volume2, Square } from "lucide-react";
+import { Send, Sparkles, Network, Mic, Volume2, Square, BrainCircuit, AudioLines } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
-import { useLanguage } from "@/hooks/useLanguage"; // Language hook import kiya
+import { useLanguage } from "@/hooks/useLanguage";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function AIMentor() {
   const [messages, setMessages] = useState([
-    { role: "assistant", content: "Hi Preet! I'm your Growtix AI Mentor. Ask me about coding, AI, or career paths. I can also speak to you in multiple languages!" }
+    { role: "assistant", content: "Hi! I'm your Growtix AI Mentor. 🚀\n\nAsk me about coding, system design, or career paths. I can also speak to you in multiple languages. How can I help you level up today?" }
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -13,9 +14,8 @@ export default function AIMentor() {
   const [speakingIndex, setSpeakingIndex] = useState<number | null>(null);
   
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { language } = useLanguage(); // Current app language
+  const { language } = useLanguage();
 
-  // BCP 47 Language Codes for Voice
   const getLanguageCode = (lang: string) => {
     const map: Record<string, string> = {
       "Hindi": "hi-IN",
@@ -24,7 +24,7 @@ export default function AIMentor() {
       "Telugu": "te-IN",
       "Punjabi": "pa-IN",
       "Hinglish (Hindi+English)": "hi-IN",
-      "English": "en-GB", // Preet, UK master's ki vibe ke liye British English!
+      "English": "en-GB", 
     };
     return map[lang] || "en-US";
   };
@@ -35,23 +35,21 @@ export default function AIMentor() {
     }
   }, [messages, isTyping]);
 
-  // --- TEXT TO SPEECH (AI Speaking) ---
+  // --- TEXT TO SPEECH ---
   const handleSpeak = (text: string, index: number) => {
     if (!('speechSynthesis' in window)) {
       alert("Your browser doesn't support text-to-speech.");
       return;
     }
 
-    // Stop if already speaking
     if (speakingIndex === index) {
       window.speechSynthesis.cancel();
       setSpeakingIndex(null);
       return;
     }
 
-    window.speechSynthesis.cancel(); // Stop any other speech
+    window.speechSynthesis.cancel(); 
     
-    // Clean text: Remove Markdown characters and Image/Diagram tags so AI doesn't read them aloud
     const cleanText = text
       .replace(/===DIAGRAM:[\s\S]*?===/g, "I have generated a diagram for you below.")
       .replace(/===IMAGE:[\s\S]*?===/g, "I have attached a visual reference below.")
@@ -68,7 +66,7 @@ export default function AIMentor() {
     window.speechSynthesis.speak(utterance);
   };
 
-  // --- SPEECH TO TEXT (Mic Input) ---
+  // --- SPEECH TO TEXT ---
   const handleListen = () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -94,7 +92,7 @@ export default function AIMentor() {
   const handleSend = async () => {
     if (!input.trim()) return;
 
-    window.speechSynthesis.cancel(); // Stop speaking when new message is sent
+    window.speechSynthesis.cancel();
     setSpeakingIndex(null);
 
     const userMessage = { role: "user", content: input };
@@ -147,20 +145,20 @@ export default function AIMentor() {
 
         return (
           <div key={index} className="my-5 group relative">
-            <div className="relative border border-border/50 rounded-2xl overflow-hidden shadow-sm bg-white">
-              <div className="bg-slate-50 px-3 py-2 border-b border-border/50 flex items-center gap-2">
-                <Network className="w-4 h-4 text-blue-600" />
-                <span className="text-xs font-bold text-slate-700">AI Generated Flowchart</span>
+            <div className="relative border border-border/50 rounded-2xl overflow-hidden shadow-sm bg-background">
+              <div className="bg-secondary/50 px-4 py-2.5 border-b border-border/50 flex items-center gap-2">
+                <Network className="w-4 h-4 text-primary" />
+                <span className="text-xs font-bold text-foreground">AI Generated Diagram</span>
               </div>
-              <div className="p-4 flex items-center justify-center min-h-[150px]">
-                <img src={graphUrl} alt="AI Diagram" className="max-w-full h-auto object-contain" />
+              <div className="p-4 flex items-center justify-center min-h-[150px] bg-white">
+                <img src={graphUrl} alt="AI Diagram" className="max-w-full h-auto object-contain rounded-lg" />
               </div>
             </div>
           </div>
         );
       }
       return (
-        <div key={index} className="prose prose-sm dark:prose-invert max-w-none prose-pre:bg-zinc-900 prose-pre:rounded-xl prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1 prose-code:rounded">
+        <div key={index} className="prose prose-sm dark:prose-invert max-w-none prose-pre:bg-[#1e1e2e] prose-pre:rounded-xl prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-p:leading-relaxed">
           <ReactMarkdown>{part}</ReactMarkdown>
         </div>
       );
@@ -168,81 +166,136 @@ export default function AIMentor() {
   };
 
   return (
-    <div className="flex flex-col h-[650px] bg-card rounded-3xl border border-border shadow-2xl overflow-hidden">
-      <div className="p-5 border-b bg-primary/5 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-primary/10 flex items-center justify-center">
-            <Bot className="text-primary w-6 h-6" />
+    <div className="flex flex-col h-[650px] bg-card/60 backdrop-blur-xl rounded-[2rem] border border-border/60 shadow-2xl overflow-hidden relative">
+      
+      {/* Background Subtle Glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-32 bg-primary/10 blur-[80px] pointer-events-none rounded-full" />
+
+      {/* Modern Header */}
+      <div className="p-5 border-b border-border/50 bg-background/50 backdrop-blur-md flex items-center justify-between z-10 relative">
+        <div className="flex items-center gap-4">
+          <div className="relative flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-[#5b6ec4] via-[#a37bb0] to-[#df7d64] shadow-lg shadow-primary/20">
+            <BrainCircuit className="text-white w-6 h-6" />
+            <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-green-500 border-2 border-background rounded-full" />
           </div>
           <div>
-            <h3 className="font-bold text-base tracking-tight">AI Mentor</h3>
-            <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest leading-none">Voice & Visual Engine Active</p>
+            <h3 className="font-heading font-extrabold text-lg tracking-tight text-foreground">Growtix Core</h3>
+            <div className="flex items-center gap-1.5 opacity-80">
+              <Sparkles className="w-3 h-3 text-primary" />
+              <p className="text-[11px] text-muted-foreground font-semibold uppercase tracking-wider">AI Mentor Active</p>
             </div>
           </div>
         </div>
-        <Sparkles className="w-5 h-5 text-primary/30" />
+        <div className="flex gap-2">
+          {speakingIndex !== null && (
+            <div className="flex items-center gap-1 px-3 py-1.5 bg-primary/10 rounded-full border border-primary/20">
+              <AudioLines className="w-4 h-4 text-primary animate-pulse" />
+              <span className="text-[10px] font-bold text-primary uppercase">Speaking</span>
+            </div>
+          )}
+        </div>
       </div>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth">
-        {messages.map((m, i) => (
-          <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[85%] p-4 rounded-3xl shadow-sm relative group ${
-              m.role === "user" ? "bg-primary text-primary-foreground rounded-tr-none" : "bg-muted/50 rounded-tl-none border border-border/50 text-foreground"
-            }`}>
-              
-              {/* Voice Readout Button for AI Messages */}
+      {/* Chat Area */}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-8 scroll-smooth custom-scrollbar z-10 relative">
+        <AnimatePresence initial={false}>
+          {messages.map((m, i) => (
+            <motion.div 
+              key={i} 
+              initial={{ opacity: 0, y: 15, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className={`flex gap-3 ${m.role === "user" ? "justify-end" : "justify-start"}`}
+            >
+              {/* AI Avatar next to message */}
               {m.role === "assistant" && (
-                <button 
-                  onClick={() => handleSpeak(m.content, i)}
-                  className="absolute -right-10 top-2 p-2 rounded-full bg-background border border-border shadow-sm text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all opacity-0 group-hover:opacity-100"
-                  title={speakingIndex === i ? "Stop speaking" : "Listen to response"}
-                >
-                  {speakingIndex === i ? <Square className="w-4 h-4 fill-current" /> : <Volume2 className="w-4 h-4" />}
-                </button>
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#5b6ec4] to-[#df7d64] flex-shrink-0 flex items-center justify-center shadow-sm mt-1">
+                  <BrainCircuit className="w-4 h-4 text-white" />
+                </div>
               )}
 
-              {renderMessage(m.content)}
-            </div>
-          </div>
-        ))}
-        {isTyping && (
-          <div className="flex justify-start">
-            <div className="bg-muted/50 p-4 rounded-3xl animate-pulse text-xs italic">Mentor is thinking...</div>
-          </div>
-        )}
+              <div className={`max-w-[80%] p-4 rounded-3xl relative group shadow-sm ${
+                m.role === "user" 
+                  ? "bg-foreground text-background rounded-tr-sm" 
+                  : "bg-secondary/50 backdrop-blur-sm rounded-tl-sm border border-border/50 text-foreground"
+              }`}>
+                
+                {/* Voice Readout Button for AI Messages */}
+                {m.role === "assistant" && (
+                  <button 
+                    onClick={() => handleSpeak(m.content, i)}
+                    className="absolute -right-12 top-2 p-2 rounded-full bg-background border border-border shadow-sm text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all opacity-0 group-hover:opacity-100 hover:scale-110 active:scale-95"
+                    title={speakingIndex === i ? "Stop speaking" : "Listen to response"}
+                  >
+                    {speakingIndex === i ? <Square className="w-4 h-4 fill-current" /> : <Volume2 className="w-4 h-4" />}
+                  </button>
+                )}
+
+                {renderMessage(m.content)}
+              </div>
+            </motion.div>
+          ))}
+
+          {/* Premium Typing Indicator */}
+          {isTyping && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex gap-3 justify-start"
+            >
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#5b6ec4] to-[#df7d64] flex-shrink-0 flex items-center justify-center shadow-sm mt-1 opacity-70">
+                <BrainCircuit className="w-4 h-4 text-white" />
+              </div>
+              <div className="bg-secondary/50 backdrop-blur-sm p-4 rounded-3xl rounded-tl-sm border border-border/50 flex items-center gap-1.5 h-[52px]">
+                <motion.div className="w-2 h-2 bg-primary/60 rounded-full" animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0 }} />
+                <motion.div className="w-2 h-2 bg-primary/60 rounded-full" animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.2 }} />
+                <motion.div className="w-2 h-2 bg-primary/60 rounded-full" animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.4 }} />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      <div className="p-5 border-t bg-background">
-        <div className="relative flex items-center gap-2">
+      {/* Sleek Input Area */}
+      <div className="p-4 bg-background/80 backdrop-blur-xl border-t border-border/50 z-10 relative">
+        <div className={`relative flex items-end gap-2 p-2 rounded-3xl border transition-all duration-300 ${isListening ? 'border-red-500/50 bg-red-500/5 shadow-[0_0_15px_rgba(239,68,68,0.1)]' : 'border-border/60 bg-secondary/30 focus-within:border-primary/50 focus-within:bg-background shadow-inner'}`}>
           
-          {/* Voice Input (Mic) Button */}
           <button 
             onClick={handleListen}
-            className={`p-3.5 rounded-2xl transition-all shadow-sm ${
-              isListening ? "bg-red-500 text-white animate-pulse shadow-red-500/30" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+            className={`p-3 rounded-full flex-shrink-0 transition-all duration-300 ${
+              isListening 
+                ? "bg-red-500 text-white animate-pulse shadow-lg shadow-red-500/30" 
+                : "bg-background border border-border/50 text-muted-foreground hover:text-foreground hover:bg-secondary"
             }`}
             title="Voice Typing"
           >
-            <Mic className="w-5 h-5" />
+            {isListening ? <AudioLines className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
           </button>
 
-          <input
+          <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSend()}
-            placeholder={isListening ? "Listening..." : "Type or speak your question..."}
-            className="flex-1 pl-5 pr-14 py-4 rounded-2xl bg-muted/30 border-border focus:bg-background transition-all outline-none text-sm"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+            placeholder={isListening ? "Listening intently..." : "Ask me anything..."}
+            className="flex-1 bg-transparent border-none focus:ring-0 resize-none py-3 px-2 text-sm text-foreground outline-none max-h-[120px] min-h-[44px] scrollbar-none"
+            rows={1}
           />
           
           <button 
             onClick={handleSend} 
             disabled={isTyping || !input.trim()}
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2.5 bg-primary text-primary-foreground rounded-xl shadow-lg hover:scale-105 transition-all disabled:opacity-50"
+            className="p-3 bg-foreground text-background rounded-full shadow-md flex-shrink-0 transition-all duration-300 disabled:opacity-40 disabled:scale-100 hover:scale-105 active:scale-95"
           >
-            <Send className="w-4 h-4" />
+            <Send className="w-4 h-4 ml-0.5" />
           </button>
+        </div>
+        <div className="text-center mt-2">
+          <p className="text-[10px] text-muted-foreground/60 font-medium tracking-wide">Growtix AI can make mistakes. Consider verifying important information.</p>
         </div>
       </div>
     </div>

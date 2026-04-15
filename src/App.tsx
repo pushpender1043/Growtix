@@ -1,3 +1,4 @@
+import { useState } from "react"; // Fixed: Added missing useState import
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -22,11 +23,14 @@ import 'regenerator-runtime/runtime';
 import ResultPage from "./pages/ResultPage";
 import CheatSheets from "./pages/CheatSheets";
 import PracticeLab from "./pages/PracticeLab";
+import Preloader from "@/components/Preloader";
 
 const queryClient = new QueryClient();
 
+// --- Protected Route Logic ---
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading, profile } = useAuth();
+  
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -34,11 +38,14 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
+  
   if (!user) return <Navigate to="/auth" replace />;
   if (!profile?.country) return <Navigate to="/onboarding" replace />;
+  
   return <>{children}</>;
 }
 
+// --- Route Definitions ---
 function AppRoutes() {
   const { user, loading, profile } = useAuth();
 
@@ -60,6 +67,8 @@ function AppRoutes() {
         path="/onboarding"
         element={user ? (profile?.country ? <Navigate to="/dashboard" replace /> : <CountrySelect />) : <Navigate to="/auth" replace />}
       />
+      
+      {/* Dashboard & Main App Layout */}
       <Route
         path="/"
         element={
@@ -80,28 +89,42 @@ function AppRoutes() {
         <Route path="/result" element={<ResultPage/>} />
         <Route path="/cheatsheets" element={<CheatSheets/>} />
         <Route path="/practice-lab" element={<PracticeLab/>} />
-
-
         <Route path="profile" element={<Profile />} />
       </Route>
+
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <LanguageProvider>
-            <AppRoutes />
-          </LanguageProvider>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
 
+// --- Main App Component ---
+const App = () => {
+  const [preloaderDone, setPreloaderDone] = useState(
+    () => !!sessionStorage.getItem("gtx_loaded")
+  );
+
+  const handlePreloaderComplete = () => {
+    sessionStorage.setItem("gtx_loaded", "1");
+    setPreloaderDone(true);
+  };
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        {!preloaderDone && <Preloader onComplete={handlePreloaderComplete} />}
+        <BrowserRouter>
+          <AuthProvider>
+            <LanguageProvider>
+              <AppRoutes />
+            </LanguageProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
+
+// CRITICAL FIX: Export default add kiya
 export default App;
