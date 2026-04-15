@@ -86,7 +86,6 @@ function AppRoutes() {
     </Routes>
   );
 }
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
