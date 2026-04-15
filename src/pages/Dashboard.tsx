@@ -1,6 +1,8 @@
 import { Flame, Trophy, Zap, BookOpen, Clock, ChevronRight, CalendarDays, ChevronLeft, Trash2, CheckCircle2, Circle, Plus } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const mockCourses = [
   { id: 1, title: "Advanced C++", progress: 72, lessons: 24, color: "gradient-primary" },
@@ -39,24 +41,30 @@ const formatDateString = (date: Date) => {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 };
 
-// 🗓️ LECTCODE STYLE CALENDAR (Now Interactive)
+// 🗓️ LECTCODE STYLE CALENDAR
 interface MiniCalendarProps {
   selectedDate: Date;
   setSelectedDate: (date: Date) => void;
 }
 
 function MiniCalendar({ selectedDate, setSelectedDate }: MiniCalendarProps) {
-  const [viewDate, setViewDate] = useState(new Date()); // Controls which month we are looking at
+  const [viewDate, setViewDate] = useState(new Date()); 
   const [streakDays, setStreakDays] = useState<string[]>([]);
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("growtix_streak") || "[]");
+    // FIX: Using a separate key for the calendar array so it doesn't break the PracticeLab Number
+    const storedCalendarDays = localStorage.getItem("growtix_streak_calendar");
+    let stored = storedCalendarDays ? JSON.parse(storedCalendarDays) : [];
+    
     const todayStr = formatDateString(new Date());
     
-    if (!stored.includes(todayStr)) {
+    // Auto-mark today if they actually solved the lab today
+    const lastSolved = localStorage.getItem("growtix_last_solved_date");
+    if (lastSolved === todayStr && !stored.includes(todayStr)) {
       stored.push(todayStr);
-      localStorage.setItem("growtix_streak", JSON.stringify(stored));
+      localStorage.setItem("growtix_streak_calendar", JSON.stringify(stored));
     }
+    
     setStreakDays(stored);
   }, []);
 
@@ -96,7 +104,6 @@ function MiniCalendar({ selectedDate, setSelectedDate }: MiniCalendarProps) {
           const isSelected = selectedDate.toDateString() === currentLoopDate.toDateString();
           const isStreakDay = streakDays.includes(dateStr);
 
-          // Styling logic
           let styles = "hover:bg-muted/50 cursor-pointer";
           if (isSelected) styles = "bg-primary text-primary-foreground font-bold shadow-md";
           else if (isToday) styles = "bg-primary/10 text-primary font-bold";
@@ -119,13 +126,12 @@ function MiniCalendar({ selectedDate, setSelectedDate }: MiniCalendarProps) {
   );
 }
 
-// 📝 FUNCTIONAL TO-DO LIST (Synced with Calendar)
+// 📝 FUNCTIONAL TO-DO LIST
 interface TodoListProps {
   selectedDate: Date;
 }
 
 function TodoList({ selectedDate }: TodoListProps) {
-  // Added dateString to the type
   const [todos, setTodos] = useState<{id: number, text: string, done: boolean, dateString: string}[]>([]);
   const [newTask, setNewTask] = useState("");
 
@@ -133,11 +139,10 @@ function TodoList({ selectedDate }: TodoListProps) {
   const displayDateText = selectedDate.toDateString() === new Date().toDateString() ? "Today" : selectedDate.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
   useEffect(() => {
-    const saved = localStorage.getItem("growtix_todos_v2"); // New key for date-synced tasks
+    const saved = localStorage.getItem("growtix_todos_v2");
     if (saved) {
       setTodos(JSON.parse(saved));
     } else {
-      // Setup some default demo tasks for "today"
       const todayStr = formatDateString(new Date());
       setTodos([
         { id: 1, text: "DSA Vocabulary Test", done: false, dateString: todayStr },
@@ -162,7 +167,6 @@ function TodoList({ selectedDate }: TodoListProps) {
     e.preventDefault();
     if (!newTask.trim()) return;
     
-    // Task is saved with the currently selected date
     const task = { id: Date.now(), text: newTask, done: false, dateString: selectedDateStr };
     setTodos([task, ...todos]);
     setNewTask("");
@@ -182,7 +186,6 @@ function TodoList({ selectedDate }: TodoListProps) {
     setTodos(todos.filter(t => t.id !== id));
   };
 
-  // Filter tasks to ONLY show ones matching the selected date
   const filteredTodos = todos.filter(t => t.dateString === selectedDateStr);
 
   return (
@@ -239,8 +242,44 @@ function TodoList({ selectedDate }: TodoListProps) {
 }
 
 export default function Dashboard() {
-  // Master state for the selected date, shared between Calendar and TodoList
+  const { user } = useAuth(); // Auth context for fetching profiles
   const [selectedDate, setSelectedDate] = useState(new Date());
+  
+  // Master states to read total streak & XP dynamically from Supabase
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const [totalXp, setTotalXp] = useState(0);
+
+  useEffect(() => {
+    // 1. Instantly load from local storage so UI doesn't flicker
+    setCurrentStreak(Number(localStorage.getItem("growtix_streak")) || 0);
+    setTotalXp(Number(localStorage.getItem("growtix_xp")) || 0);
+
+    // 2. Fetch the absolute truth from Supabase securely
+    const fetchRealStats = async () => {
+      if (user) {
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('streak, xp')
+            .eq('id', user.id)
+            .single();
+
+          if (data && !error) {
+            setCurrentStreak(data.streak || 0);
+            setTotalXp(data.xp || 0);
+
+            // Keep local storage perfectly synced with DB
+            localStorage.setItem("growtix_streak", data.streak?.toString() || "0");
+            localStorage.setItem("growtix_xp", data.xp?.toString() || "0");
+          }
+        } catch (err) {
+          console.error("Failed to sync dashboard stats:", err);
+        }
+      }
+    };
+
+    fetchRealStats();
+  }, [user]);
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -255,7 +294,8 @@ export default function Dashboard() {
             Welcome back, <span className="gradient-text">Developer</span>! 🚀
           </h1>
           <p className="text-muted-foreground">
-            Gold II Rank • 12,450 XP — Keep pushing to Platinum!
+            {/* Dynamic Total XP Display */}
+            Gold II Rank • {totalXp.toLocaleString()} XP — Keep pushing to Platinum!
           </p>
         </div>
         <div className="text-6xl animate-float">📚</div>
@@ -263,8 +303,9 @@ export default function Dashboard() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard icon={Zap} label="Total XP" value="12,450" color="gradient-primary" />
-        <StatCard icon={Flame} label="Day Streak" value="14 🔥" color="gradient-warm" />
+        {/* Securely dynamically loaded XP & Streak */}
+        <StatCard icon={Zap} label="Total XP" value={totalXp.toLocaleString()} color="gradient-primary" />
+        <StatCard icon={Flame} label="Day Streak" value={`${currentStreak} 🔥`} color="gradient-warm" />
         <StatCard icon={Trophy} label="Global Rank" value="#342" color="gradient-accent" />
       </div>
 
@@ -330,7 +371,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Right sidebar - Now Synced! */}
+        {/* Right sidebar */}
         <div className="space-y-4">
           <MiniCalendar selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
           <TodoList selectedDate={selectedDate} />

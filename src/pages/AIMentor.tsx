@@ -1,352 +1,248 @@
-// import { useState, useRef, useEffect } from "react";
-// import { Send, Paperclip, Bot, User, Upload } from "lucide-react";
-// import { motion, AnimatePresence } from "framer-motion";
-
-// interface Message {
-//   id: number;
-//   role: "user" | "ai";
-//   content: string;
-// }
-
-// const initialMessages: Message[] = [
-//   {
-//     id: 1,
-//     role: "ai",
-//     content: "👋 Hello! I'm your AI Coding Mentor. I can help you with programming concepts, debug your code, or conduct a mock interview. What would you like to work on today?",
-//   },
-// ];
-
-// export default function AIMentor() {
-//   const [mode, setMode] = useState<"mentor" | "interview">("mentor");
-//   const [messages, setMessages] = useState<Message[]>(initialMessages);
-//   const [input, setInput] = useState("");
-//   const [style, setStyle] = useState("Step-by-Step");
-//   const [isTyping, setIsTyping] = useState(false);
-//   const bottomRef = useRef<HTMLDivElement>(null);
-
-//   useEffect(() => {
-//     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-//   }, [messages]);
-
-//   const handleSend = () => {
-//     if (!input.trim()) return;
-//     const userMsg: Message = { id: Date.now(), role: "user", content: input };
-//     setMessages((prev) => [...prev, userMsg]);
-//     setInput("");
-//     setIsTyping(true);
-
-//     setTimeout(() => {
-//       const aiReply: Message = {
-//         id: Date.now() + 1,
-//         role: "ai",
-//         content: mode === "mentor"
-//           ? `Great question! Let me explain that using a **${style}** approach.\n\nHere's a quick example:\n\`\`\`python\ndef solve(n):\n    # Your solution here\n    return result\n\`\`\`\n\nWould you like me to elaborate further?`
-//           : `That's a solid answer! For a real interview, I'd suggest also mentioning **time complexity**. Let's try another question:\n\n*"How would you design a URL shortener service?"*`,
-//       };
-//       setMessages((prev) => [...prev, aiReply]);
-//       setIsTyping(false);
-//     }, 1200);
-//   };
-
-//   return (
-//     <div className="max-w-4xl mx-auto flex flex-col h-[calc(100vh-8rem)]">
-//       {/* Header */}
-//       <div className="clay-card p-4 mb-4 flex flex-wrap items-center justify-between gap-3">
-//         <div className="flex items-center gap-3">
-//           <div className="flex bg-muted/50 rounded-xl p-0.5">
-//             <button
-//               onClick={() => setMode("mentor")}
-//               className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
-//                 mode === "mentor" ? "gradient-primary text-primary-foreground" : "text-muted-foreground"
-//               }`}
-//             >
-//               Coding Mentor
-//             </button>
-//             <button
-//               onClick={() => setMode("interview")}
-//               className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
-//                 mode === "interview" ? "gradient-primary text-primary-foreground" : "text-muted-foreground"
-//               }`}
-//             >
-//               Mock Interviewer
-//             </button>
-//           </div>
-//         </div>
-//         {mode === "interview" && (
-//           <button className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-border text-sm hover:bg-muted/50 transition-colors">
-//             <Upload className="w-4 h-4" /> Upload Resume
-//           </button>
-//         )}
-//       </div>
-
-//       {/* Chat area */}
-//       <div className="clay-card flex-1 flex flex-col overflow-hidden">
-//         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-//           <AnimatePresence>
-//             {messages.map((msg) => (
-//               <motion.div
-//                 key={msg.id}
-//                 initial={{ opacity: 0, y: 10 }}
-//                 animate={{ opacity: 1, y: 0 }}
-//                 className={`flex gap-3 ${msg.role === "user" ? "justify-end" : ""}`}
-//               >
-//                 {msg.role === "ai" && (
-//                   <div className="w-8 h-8 rounded-xl gradient-primary flex items-center justify-center flex-shrink-0">
-//                     <Bot className="w-4 h-4 text-primary-foreground" />
-//                   </div>
-//                 )}
-//                 <div
-//                   className={`max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-//                     msg.role === "user"
-//                       ? "gradient-primary text-primary-foreground rounded-br-md"
-//                       : "bg-muted/50 text-foreground rounded-bl-md"
-//                   }`}
-//                 >
-//                   <p className="whitespace-pre-wrap">{msg.content}</p>
-//                 </div>
-//                 {msg.role === "user" && (
-//                   <div className="w-8 h-8 rounded-xl bg-accent flex items-center justify-center flex-shrink-0">
-//                     <User className="w-4 h-4 text-accent-foreground" />
-//                   </div>
-//                 )}
-//               </motion.div>
-//             ))}
-//           </AnimatePresence>
-//           {isTyping && (
-//             <div className="flex gap-3 items-center">
-//               <div className="w-8 h-8 rounded-xl gradient-primary flex items-center justify-center">
-//                 <Bot className="w-4 h-4 text-primary-foreground" />
-//               </div>
-//               <div className="bg-muted/50 rounded-2xl px-4 py-3">
-//                 <div className="flex gap-1">
-//                   <span className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "0ms" }} />
-//                   <span className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "150ms" }} />
-//                   <span className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "300ms" }} />
-//                 </div>
-//               </div>
-//             </div>
-//           )}
-//           <div ref={bottomRef} />
-//         </div>
-
-//         {/* Input */}
-//         <div className="border-t border-border/50 p-3">
-//           <div className="flex items-end gap-2">
-//             <button className="p-2 rounded-xl hover:bg-muted/50 text-muted-foreground transition-colors">
-//               <Paperclip className="w-5 h-5" />
-//             </button>
-//             <div className="flex-1 relative">
-//               <textarea
-//                 value={input}
-//                 onChange={(e) => setInput(e.target.value)}
-//                 onKeyDown={(e) => {
-//                   if (e.key === "Enter" && !e.shiftKey) {
-//                     e.preventDefault();
-//                     handleSend();
-//                   }
-//                 }}
-//                 placeholder="Ask me anything..."
-//                 rows={1}
-//                 className="w-full px-4 py-2.5 rounded-xl bg-muted/30 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
-//               />
-//             </div>
-//             <select
-//               value={style}
-//               onChange={(e) => setStyle(e.target.value)}
-//               className="px-2 py-2 rounded-xl bg-muted/30 text-xs border-0 focus:ring-2 focus:ring-primary/30 hidden sm:block"
-//             >
-//               <option>Step-by-Step</option>
-//               <option>Visual</option>
-//               <option>Analogy</option>
-//             </select>
-//             <button
-//               onClick={handleSend}
-//               className="p-2.5 rounded-xl gradient-primary text-primary-foreground hover:opacity-90 transition-opacity"
-//             >
-//               <Send className="w-4 h-4" />
-//             </button>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-import { getGeminiResponse } from "../lib/gemini"; // Adjust path if needed
 import { useState, useRef, useEffect } from "react";
-import { Send, Paperclip, Bot } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { supabase } from "../lib/supabase"; // Adjust this path if needed
-
-// Update these import paths based on exactly where you saved them!
-import { MentorChatBox } from "../features/ai-mentor/components/MentorChatBox";
-import { QuickActionChips } from "../features/ai-mentor/components/QuickActionChips";
-
-export interface Message {
-  id: number;
-  role: "user" | "ai";
-  content: string;
-}
-
-const initialMessages: Message[] = [
-  {
-    id: 1,
-    role: "ai",
-    content: "👋 Hello! I'm your AI Coding Mentor. I can help you with programming concepts, debug your code, or explain algorithms. What would you like to work on today?",
-  },
-];
+import { Send, Bot, Sparkles, Network, Mic, Volume2, Square } from "lucide-react";
+import ReactMarkdown from 'react-markdown';
+import { useLanguage } from "@/hooks/useLanguage"; // Language hook import kiya
 
 export default function AIMentor() {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [messages, setMessages] = useState([
+    { role: "assistant", content: "Hi Preet! I'm your Growtix AI Mentor. Ask me about coding, AI, or career paths. I can also speak to you in multiple languages!" }
+  ]);
   const [input, setInput] = useState("");
-  const [style, setStyle] = useState("Step-by-Step");
   const [isTyping, setIsTyping] = useState(false);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const [isListening, setIsListening] = useState(false);
+  const [speakingIndex, setSpeakingIndex] = useState<number | null>(null);
+  
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const { language } = useLanguage(); // Current app language
 
-  // Auto-scroll to bottom when new messages appear
+  // BCP 47 Language Codes for Voice
+  const getLanguageCode = (lang: string) => {
+    const map: Record<string, string> = {
+      "Hindi": "hi-IN",
+      "Marathi": "mr-IN",
+      "Tamil": "ta-IN",
+      "Telugu": "te-IN",
+      "Punjabi": "pa-IN",
+      "Hinglish (Hindi+English)": "hi-IN",
+      "English": "en-GB", // Preet, UK master's ki vibe ke liye British English!
+    };
+    return map[lang] || "en-US";
+  };
+
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
   }, [messages, isTyping]);
 
-
-  const handleSend = async (overrideText?: string) => {
-    const textToSend = overrideText || input;
-    if (!textToSend.trim()) return;
-
-    // 0. Check if the user is actually logged in first!
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      alert("Please log in to use the AI Mentor!");
+  // --- TEXT TO SPEECH (AI Speaking) ---
+  const handleSpeak = (text: string, index: number) => {
+    if (!('speechSynthesis' in window)) {
+      alert("Your browser doesn't support text-to-speech.");
       return;
     }
 
-    // 1. Update UI immediately so it feels fast
-    const userMsg: Message = { id: Date.now(), role: "user", content: textToSend };
-    setMessages((prev) => [...prev, userMsg]);
-    setInput(""); 
+    // Stop if already speaking
+    if (speakingIndex === index) {
+      window.speechSynthesis.cancel();
+      setSpeakingIndex(null);
+      return;
+    }
+
+    window.speechSynthesis.cancel(); // Stop any other speech
+    
+    // Clean text: Remove Markdown characters and Image/Diagram tags so AI doesn't read them aloud
+    const cleanText = text
+      .replace(/===DIAGRAM:[\s\S]*?===/g, "I have generated a diagram for you below.")
+      .replace(/===IMAGE:[\s\S]*?===/g, "I have attached a visual reference below.")
+      .replace(/[*#`_]/g, "");
+
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = getLanguageCode(language);
+    utterance.rate = 1.0;
+    
+    utterance.onend = () => setSpeakingIndex(null);
+    utterance.onerror = () => setSpeakingIndex(null);
+    
+    setSpeakingIndex(index);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // --- SPEECH TO TEXT (Mic Input) ---
+  const handleListen = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Voice input is not supported in this browser. Try Chrome.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = getLanguageCode(language);
+    recognition.interimResults = false;
+
+    recognition.onstart = () => setIsListening(true);
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setInput(prev => prev + (prev ? " " : "") + transcript);
+    };
+    recognition.onend = () => setIsListening(false);
+    recognition.onerror = () => setIsListening(false);
+
+    recognition.start();
+  };
+
+  const handleSend = async () => {
+    if (!input.trim()) return;
+
+    window.speechSynthesis.cancel(); // Stop speaking when new message is sent
+    setSpeakingIndex(null);
+
+    const userMessage = { role: "user", content: input };
+    setMessages(prev => [...prev, userMessage]);
+    setInput("");
     setIsTyping(true);
 
-    // 2. Save the User's message to Supabase (in the background)
-    await supabase.from('mentor_chats' as any).insert({
-      role: 'user',
-      content: textToSend,
-      user_id: user.id
-    });
+    try {
+      const apiKey = import.meta.env.VITE_GROQ_API_KEY_MENTOR;
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "llama-3.1-8b-instant", 
+          messages: [
+            {
+              role: "system",
+              content: `You are Growtix AI Mentor. The user is asking in ${language}. Try to respond in ${language} if possible, or simple English.
+              1. Use Markdown for text.
+              2. For Code: Use triple backticks.
+              3. For Diagrams: Use ===DIAGRAM: (Graphviz DOT code) ===`
+            },
+            ...messages.map(m => ({ role: m.role, content: m.content })),
+            userMessage
+          ],
+        }),
+      });
 
-    // 3. Call the real Gemini API
-    const aiResponseText = await getGeminiResponse(textToSend, messages, style);
+      const data = await response.json();
+      if (data.choices && data.choices.length > 0) {
+        setMessages(prev => [...prev, { role: "assistant", content: data.choices[0].message.content }]);
+      }
+    } catch (error) {
+      setMessages(prev => [...prev, { role: "assistant", content: "Network issue. Please try again!" }]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
 
-    // 4. Update UI with AI's response
-    const aiReply: Message = {
-      id: Date.now() + 1,
-      role: "ai",
-      content: aiResponseText,
-    };
-    setMessages((prev) => [...prev, aiReply]);
-    setIsTyping(false);
+  const renderMessage = (content: string) => {
+    const parts = content.split(/===DIAGRAM:\s*(.*?)===/gs);
 
-    // 5. Save the AI's message to Supabase
-    await supabase.from('mentor_chats' as any).insert({
-      role: 'ai',
-      content: aiResponseText,
-      user_id: user.id
+    return parts.map((part, index) => {
+      if (index % 2 === 1) {
+        const encodedGraph = encodeURIComponent(part.trim());
+        const graphUrl = `https://quickchart.io/graphviz?graph=${encodedGraph}`;
+
+        return (
+          <div key={index} className="my-5 group relative">
+            <div className="relative border border-border/50 rounded-2xl overflow-hidden shadow-sm bg-white">
+              <div className="bg-slate-50 px-3 py-2 border-b border-border/50 flex items-center gap-2">
+                <Network className="w-4 h-4 text-blue-600" />
+                <span className="text-xs font-bold text-slate-700">AI Generated Flowchart</span>
+              </div>
+              <div className="p-4 flex items-center justify-center min-h-[150px]">
+                <img src={graphUrl} alt="AI Diagram" className="max-w-full h-auto object-contain" />
+              </div>
+            </div>
+          </div>
+        );
+      }
+      return (
+        <div key={index} className="prose prose-sm dark:prose-invert max-w-none prose-pre:bg-zinc-900 prose-pre:rounded-xl prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1 prose-code:rounded">
+          <ReactMarkdown>{part}</ReactMarkdown>
+        </div>
+      );
     });
   };
 
   return (
-    <div className="max-w-4xl mx-auto flex flex-col h-[calc(100vh-8rem)]">
-      {/* Header - Simplified for Mentor Mode Only */}
-      <div className="clay-card p-4 mb-4 flex items-center justify-between">
+    <div className="flex flex-col h-[650px] bg-card rounded-3xl border border-border shadow-2xl overflow-hidden">
+      <div className="p-5 border-b bg-primary/5 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-            <Bot className="w-6 h-6 text-primary" />
+          <div className="w-11 h-11 rounded-2xl bg-primary/10 flex items-center justify-center">
+            <Bot className="text-primary w-6 h-6" />
           </div>
           <div>
-            <h1 className="font-semibold text-foreground">AI Coding Mentor</h1>
-            <p className="text-xs text-muted-foreground">Powered by Gemini</p>
+            <h3 className="font-bold text-base tracking-tight">AI Mentor</h3>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest leading-none">Voice & Visual Engine Active</p>
+            </div>
           </div>
         </div>
+        <Sparkles className="w-5 h-5 text-primary/30" />
       </div>
 
-      {/* Chat Area */}
-      <div className="clay-card flex-1 flex flex-col overflow-hidden relative">
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
-          <AnimatePresence>
-            {messages.map((msg) => (
-              <motion.div
-                key={msg.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                {/* Our newly created Markdown Chat Box */}
-                <MentorChatBox message={msg} />
-              </motion.div>
-            ))}
-          </AnimatePresence>
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth">
+        {messages.map((m, i) => (
+          <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+            <div className={`max-w-[85%] p-4 rounded-3xl shadow-sm relative group ${
+              m.role === "user" ? "bg-primary text-primary-foreground rounded-tr-none" : "bg-muted/50 rounded-tl-none border border-border/50 text-foreground"
+            }`}>
+              
+              {/* Voice Readout Button for AI Messages */}
+              {m.role === "assistant" && (
+                <button 
+                  onClick={() => handleSpeak(m.content, i)}
+                  className="absolute -right-10 top-2 p-2 rounded-full bg-background border border-border shadow-sm text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all opacity-0 group-hover:opacity-100"
+                  title={speakingIndex === i ? "Stop speaking" : "Listen to response"}
+                >
+                  {speakingIndex === i ? <Square className="w-4 h-4 fill-current" /> : <Volume2 className="w-4 h-4" />}
+                </button>
+              )}
 
-          {/* Typing Indicator */}
-          {isTyping && (
-            <motion.div 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
-              className="flex justify-start w-full mb-6"
-            >
-              <div className="bg-muted/50 border border-border rounded-2xl px-4 py-4 flex gap-1">
-                <span className="w-2 h-2 rounded-full bg-primary/50 animate-bounce" style={{ animationDelay: "0ms" }} />
-                <span className="w-2 h-2 rounded-full bg-primary/50 animate-bounce" style={{ animationDelay: "150ms" }} />
-                <span className="w-2 h-2 rounded-full bg-primary/50 animate-bounce" style={{ animationDelay: "300ms" }} />
-              </div>
-            </motion.div>
-          )}
-          <div ref={bottomRef} />
-        </div>
-
-        {/* Input Area */}
-        <div className="p-4 bg-background border-t border-border/50">
-          {/* Our newly created Quick Action Chips */}
-          <QuickActionChips onSelect={(prompt) => handleSend(prompt)} />
-
-          <div className="flex items-end gap-2">
-            <button className="p-3 rounded-xl hover:bg-muted text-muted-foreground transition-colors">
-              <Paperclip className="w-5 h-5" />
-            </button>
-            <div className="flex-1 relative">
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSend();
-                  }
-                }}
-                placeholder="Ask for hints, code explanations, or debugging help..."
-                rows={1}
-                className="w-full px-4 py-3 rounded-xl bg-muted/50 border border-border text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-              />
+              {renderMessage(m.content)}
             </div>
-            
-            {/* Context Selector */}
-            <select
-              value={style}
-              onChange={(e) => setStyle(e.target.value)}
-              className="px-3 py-3 rounded-xl bg-muted/50 border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 hidden sm:block cursor-pointer text-muted-foreground"
-            >
-              <option>Step-by-Step</option>
-              <option>Visual</option>
-              <option>Analogy</option>
-            </select>
-            
-            {/* Send Button */}
-            <button
-              onClick={() => handleSend()}
-              disabled={!input.trim() && !isTyping}
-              className="p-3 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Send className="w-5 h-5" />
-            </button>
           </div>
+        ))}
+        {isTyping && (
+          <div className="flex justify-start">
+            <div className="bg-muted/50 p-4 rounded-3xl animate-pulse text-xs italic">Mentor is thinking...</div>
+          </div>
+        )}
+      </div>
+
+      <div className="p-5 border-t bg-background">
+        <div className="relative flex items-center gap-2">
+          
+          {/* Voice Input (Mic) Button */}
+          <button 
+            onClick={handleListen}
+            className={`p-3.5 rounded-2xl transition-all shadow-sm ${
+              isListening ? "bg-red-500 text-white animate-pulse shadow-red-500/30" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+            }`}
+            title="Voice Typing"
+          >
+            <Mic className="w-5 h-5" />
+          </button>
+
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={(e) => e.key === "Enter" && handleSend()}
+            placeholder={isListening ? "Listening..." : "Type or speak your question..."}
+            className="flex-1 pl-5 pr-14 py-4 rounded-2xl bg-muted/30 border-border focus:bg-background transition-all outline-none text-sm"
+          />
+          
+          <button 
+            onClick={handleSend} 
+            disabled={isTyping || !input.trim()}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2.5 bg-primary text-primary-foreground rounded-xl shadow-lg hover:scale-105 transition-all disabled:opacity-50"
+          >
+            <Send className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </div>

@@ -23,7 +23,8 @@ const navItems = [
   { title: "Mock Interview", url: "/mock-interview", icon: UserCheck },
   { title: "Smart Editor", url: "/smart-editor", icon: Code },
   { title: "Dev Arena", url: "/dev-arena", icon: Swords },
-  { title: "Cheat Sheet", url: "/cheatsheets", icon: Swords }
+  { title: "Cheat Sheet", url: "/cheatsheets", icon: Swords },
+  { title: "Practice Lab", url: "/practice-lab", icon: GraduationCap },
 
   
 ];

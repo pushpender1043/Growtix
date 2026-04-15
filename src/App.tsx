@@ -21,6 +21,7 @@ import InterviewRoomPage from "./pages/InterviewRoomPage";
 import 'regenerator-runtime/runtime';
 import ResultPage from "./pages/ResultPage";
 import CheatSheets from "./pages/CheatSheets";
+import PracticeLab from "./pages/PracticeLab";
 
 const queryClient = new QueryClient();
 
@@ -78,6 +79,7 @@ function AppRoutes() {
         <Route path="/interview-room" element={<InterviewRoomPage />} />
         <Route path="/result" element={<ResultPage/>} />
         <Route path="/cheatsheets" element={<CheatSheets/>} />
+        <Route path="/practice-lab" element={<PracticeLab/>} />
 
 
         <Route path="profile" element={<Profile />} />

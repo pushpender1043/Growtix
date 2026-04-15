@@ -1,0 +1,7 @@
+[33m09b74b8[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{0}: pull origin main: Fast-forward
+[33m7e569e2[m[33m ([m[1;32mmy-new-feature[m[33m)[m HEAD@{1}: checkout: moving from my-new-feature to main
+[33m7e569e2[m[33m ([m[1;32mmy-new-feature[m[33m)[m HEAD@{2}: checkout: moving from main to my-new-feature
+[33m7e569e2[m[33m ([m[1;32mmy-new-feature[m[33m)[m HEAD@{3}: commit: temp: saving my changes before pull
+[33mc8bc978[m HEAD@{4}: checkout: moving from master to main
+[33m09b7e88[m[33m ([m[1;32mmaster[m[33m)[m HEAD@{5}: commit: updated ai mentor and notification
+[33mc8bc978[m HEAD@{6}: initial pull
